@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Path to Operating Profit Calculator</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <div class="card-header">
+        <h2>Path to Operating Profit Calculator</h2>
+      </div>
+      <div class="card-content">
+        <!-- Search Section -->
+        <div class="search-section">
+          <input
+            type="text"
+            id="tickerInput"
+            placeholder="Enter ticker symbol (e.g., AAPL)"
+            class="ticker-input"
+          />
+          <button id="searchButton" class="search-button">
+            <svg
+              viewBox="0 0 24 24"
+              class="search-icon"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            Search
+          </button>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state hidden">
+          <p>Fetching company data...</p>
+        </div>
+
+        <!-- Status Display -->
+        <div id="statusDisplay" class="status-display hidden">
+          <div class="status-icon-container">
+            <svg
+              class="status-icon"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M20 6L9 17l-5-5"></path>
+            </svg>
+          </div>
+          <p id="statusText"></p>
+        </div>
+
+        <!-- Results Display -->
+        <div id="resultsDisplay" class="results-display hidden">
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <h4>Input Metrics</h4>
+              <div class="metric-content">
+                <p id="revenue"></p>
+                <p id="grossMargin"></p>
+                <p id="operatingExpenses"></p>
+                <p id="growthRate"></p>
+              </div>
+            </div>
+
+            <div class="metric-card blue">
+              <h4>Time to Profitability</h4>
+              <p id="timeToProfit" class="large-text"></p>
+              <p id="timeToYears" class="small-text"></p>
+            </div>
+          </div>
+
+          <div class="projected-metrics">
+            <h4>Projected Metrics at Profitability</h4>
+            <div class="metrics-grid-3">
+              <div>
+                <p class="label">Quarterly Revenue</p>
+                <p id="projectedRevenue" class="value"></p>
+              </div>
+              <div>
+                <p class="label">Operating Expenses</p>
+                <p id="projectedExpenses" class="value"></p>
+              </div>
+              <div>
+                <p class="label">Quarterly Profit</p>
+                <p id="projectedProfit" class="value"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="formula-section">
+          <h3 class="formula-title">Profitability Projection Formula</h3>
+          <div class="formula">P(t) = [R₀(1 + g)^t × m] - [E₀(1 + e)^t]</div>
+          <p class="formula-explanation">
+            This formula projects when a company will achieve profitability
+            where P(t) is the projected profit at time t, R₀ is initial
+            quarterly revenue, g is quarterly revenue growth rate, t is time in
+            quarters, m is gross margin as a decimal, E₀ is initial operating
+            expenses, and e is the operating expense growth rate. The company
+            achieves profitability when gross profit exceeds operating expenses.
+          </p>
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  </body>
+</html>

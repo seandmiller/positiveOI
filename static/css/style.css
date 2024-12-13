@@ -1,0 +1,281 @@
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f2f5;
+  padding: 20px;
+  line-height: 1.6;
+}
+
+/* Container styles */
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Header styles */
+.card-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.card-header h2 {
+  color: #333;
+  font-size: 24px;
+}
+
+/* Content styles */
+.card-content {
+  padding: 20px;
+}
+
+/* Search section styles */
+.search-section {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.ticker-input {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px;
+  text-transform: uppercase;
+}
+
+.search-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  background: #1976d2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.search-button:hover {
+  background: #1565c0;
+}
+
+.search-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* State styles */
+.hidden {
+  display: none;
+}
+
+.loading-state {
+  background: #e3f2fd;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.error-display {
+  background: #ffebee;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.error-display p {
+  color: #c62828;
+}
+
+.alert-icon {
+  width: 24px;
+  height: 24px;
+  color: #c62828;
+}
+
+/* Results styles */
+.results-display {
+  margin-top: 20px;
+}
+
+.metrics-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.metric-card {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.metric-card.blue {
+  background: #e3f2fd;
+}
+
+.metric-card h4 {
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 18px;
+}
+
+.metric-content p {
+  margin-bottom: 8px;
+  color: #555;
+}
+
+.large-text {
+  font-size: 24px;
+  font-weight: bold;
+  color: #1976d2;
+  margin: 10px 0;
+}
+
+.small-text {
+  color: #1976d2;
+  font-size: 14px;
+}
+
+.projected-metrics {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.metrics-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.metrics-grid-3 .label {
+  color: #666;
+  font-size: 14px;
+}
+
+.metrics-grid-3 .value {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+  margin-top: 5px;
+}
+/* Add these styles to your existing CSS */
+.status-display {
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: none; /* Changed from flex to none */
+  align-items: center;
+  gap: 10px;
+}
+
+.status-display.visible {
+  display: flex; /* Will show as flex when visible class is added */
+}
+
+.status-display.error {
+  background: #ffebee;
+}
+
+.status-display.error p {
+  color: #c62828;
+}
+
+.status-display.error .status-icon {
+  color: #c62828;
+}
+
+.status-display.success {
+  background: #e8f5e9;
+}
+
+.status-display.success p {
+  color: #2e7d32;
+}
+
+.status-display.success .status-icon {
+  color: #2e7d32;
+}
+
+.status-icon {
+  width: 24px;
+  height: 24px;
+}
+
+/* Update hidden class to use display: none */
+.hidden {
+  display: none !important;
+}
+
+/* Add these styles for the formula section */
+.formula-section {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+  text-align: center;
+}
+
+.formula-title {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 20px;
+}
+
+.formula {
+  font-family: "Times New Roman", Times, serif;
+  font-size: 24px;
+  margin: 20px 0;
+  color: #1976d2;
+}
+
+.formula-explanation {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  color: #555;
+  line-height: 1.6;
+  padding: 0 20px;
+}
+/* Responsive design */
+@media (max-width: 768px) {
+  .metrics-grid,
+  .metrics-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .container {
+    margin: 0;
+  }
+
+  .search-section {
+    flex-direction: column;
+  }
+
+  .search-button {
+    width: 100%;
+    justify-content: center;
+  }
+}
