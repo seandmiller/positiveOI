@@ -3,7 +3,7 @@ from flask_cors import CORS
 import yfinance as yf
 import numpy as np
 import math
-import pandas as pd
+
 
 app = Flask(__name__)
 CORS(app)
