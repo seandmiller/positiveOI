@@ -54,7 +54,7 @@ opencv-python==4.9.0.80
 opt-einsum==3.3.0
 optree==0.11.0
 packaging==23.1
-Panda3D==1.10.14
+Panda3D==1.10.15
 pandas==2.0.3
 peewee==3.17.5
 Pillow==10.0.0
