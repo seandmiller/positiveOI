@@ -81,7 +81,7 @@ def get_quarterly_data(ticker_symbol):
             except:
                 raise ValueError("Unable to calculate gross margin")
 
-        # Calculate growth ratess
+        # Calculate growth rates
         revenue_growth = calculate_growth_rate(current_revenue, previous_revenue)
         expense_growth = calculate_growth_rate(current_op_expenses, previous_op_expenses)
 
