@@ -16,7 +16,7 @@ const timeToYears = document.getElementById("timeToYears");
 const projectedRevenue = document.getElementById("projectedRevenue");
 const projectedExpenses = document.getElementById("projectedExpenses");
 const projectedProfit = document.getElementById("projectedProfit");
-
+const projectedGrossProfit = document.getElementById("projectedGrossProfit");
 // Event Listeners
 searchButton.addEventListener("click", handleSearch);
 tickerInput.addEventListener("keypress", (e) => {
@@ -74,6 +74,7 @@ function displayResults(data) {
       : `(${profitability.yearsToProfit} years)`;
 
   projectedRevenue.textContent = `$${profitability.projectedRevenue}M`;
+  projectedGrossProfit.textContent = `$${profitability.projectedGrossProfit}M`;
   projectedExpenses.textContent = `$${profitability.projectedExpenses}M`;
   projectedProfit.textContent = `$${profitability.projectedProfit}M`;
 
