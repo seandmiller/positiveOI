@@ -307,6 +307,51 @@ body {
 .sentiment-neutral {
   color: #555;
 }
+/* Add to your existing CSS */
+.sentiment-slider {
+  margin: 20px 0;
+}
+
+.slider-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #ff4444 0%,
+    #ffaa44 25%,
+    #e5e5e5 50%,
+    #88cc88 75%,
+    #44bb44 100%
+  );
+}
+
+.slider-handle {
+  position: absolute;
+  top: 50%;
+  width: 12px;
+  height: 24px;
+  background: white;
+  border: 2px solid #666;
+  border-radius: 8px;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 5px;
+  color: #666;
+  font-size: 0.875rem;
+}
+
+.slider-score {
+  text-align: center;
+  margin-top: 5px;
+  font-weight: 500;
+  color: #333;
+}
 
 /* Responsive design */
 @media (max-width: 768px) {

@@ -1,4 +1,3 @@
-// DOM Elements
 const tickerInput = document.getElementById("tickerInput");
 const searchButton = document.getElementById("searchButton");
 const loadingState = document.getElementById("loadingState");
@@ -6,7 +5,6 @@ const statusDisplay = document.getElementById("statusDisplay");
 const statusText = document.getElementById("statusText");
 const resultsDisplay = document.getElementById("resultsDisplay");
 
-// Metrics Elements
 const revenue = document.getElementById("revenue");
 const grossMargin = document.getElementById("grossMargin");
 const operatingExpenses = document.getElementById("operatingExpenses");
@@ -17,7 +15,7 @@ const projectedRevenue = document.getElementById("projectedRevenue");
 const projectedExpenses = document.getElementById("projectedExpenses");
 const projectedProfit = document.getElementById("projectedProfit");
 const projectedGrossProfit = document.getElementById("projectedGrossProfit");
-// Event Listeners
+
 searchButton.addEventListener("click", handleSearch);
 tickerInput.addEventListener("keypress", (e) => {
   if (e.key === "Enter") {
@@ -56,13 +54,11 @@ async function handleSearch() {
 function displayResults(data) {
   const { inputMetrics, profitability } = data;
 
-  // Display input metrics
   revenue.textContent = `Revenue: $${inputMetrics.quarterlyRevenue}M`;
   grossMargin.textContent = `Gross Margin: ${inputMetrics.grossMargin}%`;
   operatingExpenses.textContent = `Operating Expenses: $${inputMetrics.operatingExpenses}M`;
   growthRate.textContent = `Growth Rate: ${inputMetrics.revenueGrowthRate}%`;
 
-  // Display profitability metrics
   timeToProfit.textContent =
     typeof profitability.quartersToProfitability === "number"
       ? `${profitability.quartersToProfitability} Quarters`
@@ -79,14 +75,25 @@ function displayResults(data) {
   projectedProfit.textContent = `$${profitability.projectedProfit}M`;
 
   showResults();
-  if (data.sentiment) {
-    const sentimentClass = getSentimentClass(data.sentiment.averageSentiment);
 
+  if (data.sentiment) {
     document.getElementById("avgSentiment").textContent =
       data.sentiment.averageSentiment.toFixed(2);
     document.getElementById("sentimentCategory").textContent =
       data.sentiment.sentimentCategory;
     document.getElementById("newsCount").textContent = data.sentiment.newsCount;
+
+    const handle = document.getElementById("sentimentHandle");
+    const scoreDisplay = document.getElementById("sentimentScore");
+
+    // Convert sentiment from -1:1 range to percentage for positioning
+    const position = ((data.sentiment.averageSentiment + 1) / 2) * 100;
+    handle.style.left = `${position}%`;
+
+    // Update score display
+    scoreDisplay.textContent = `${
+      data.sentiment.sentimentCategory
+    } (${data.sentiment.averageSentiment.toFixed(2)})`;
 
     // Display recent news
     const newsList = document.getElementById("newsList");
@@ -98,14 +105,14 @@ function displayResults(data) {
       const sentimentClass = getSentimentClass(news.sentiment);
 
       newsItem.innerHTML = `
-            <p>${news.title}</p>
-            <p class="news-date">
-                ${news.date} - Sentiment: 
-                <span class="${sentimentClass}">
-                    ${news.sentiment.toFixed(2)}
-                </span>
-            </p>
-        `;
+        <p>${news.title}</p>
+        <p class="news-date">
+          ${news.date} - Sentiment: 
+          <span class="${sentimentClass}">
+            ${news.sentiment.toFixed(2)}
+          </span>
+        </p>
+      `;
       newsList.appendChild(newsItem);
     });
   }
