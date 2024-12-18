@@ -79,6 +79,42 @@ function displayResults(data) {
   projectedProfit.textContent = `$${profitability.projectedProfit}M`;
 
   showResults();
+  if (data.sentiment) {
+    const sentimentClass = getSentimentClass(data.sentiment.averageSentiment);
+
+    document.getElementById("avgSentiment").textContent =
+      data.sentiment.averageSentiment.toFixed(2);
+    document.getElementById("sentimentCategory").textContent =
+      data.sentiment.sentimentCategory;
+    document.getElementById("newsCount").textContent = data.sentiment.newsCount;
+
+    // Display recent news
+    const newsList = document.getElementById("newsList");
+    newsList.innerHTML = ""; // Clear existing news
+
+    data.sentiment.recentNews.forEach((news) => {
+      const newsItem = document.createElement("div");
+      newsItem.className = "news-item";
+      const sentimentClass = getSentimentClass(news.sentiment);
+
+      newsItem.innerHTML = `
+            <p>${news.title}</p>
+            <p class="news-date">
+                ${news.date} - Sentiment: 
+                <span class="${sentimentClass}">
+                    ${news.sentiment.toFixed(2)}
+                </span>
+            </p>
+        `;
+      newsList.appendChild(newsItem);
+    });
+  }
+}
+
+function getSentimentClass(sentiment) {
+  if (sentiment >= 0.1) return "sentiment-positive";
+  if (sentiment <= -0.1) return "sentiment-negative";
+  return "sentiment-neutral";
 }
 
 function showLoading() {

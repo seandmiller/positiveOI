@@ -2,11 +2,80 @@ from flask import Flask, jsonify, render_template
 import yfinance as yf
 import numpy as np
 import math
+from datetime import datetime, timedelta
+import statistics
+from textblob import TextBlob
+
 
 app = Flask(__name__)
+def get_news_sentiment(ticker_symbol):
+
+    try:
+        stock = yf.Ticker(ticker_symbol)
+        news = stock.news
+        
+        if not news:
+            return {
+                'averageSentiment': 0,
+                'sentimentCategory': 'Neutral',
+                'newsCount': 0,
+                'recentNews': []
+            }
+
+        # Analyze sentiment for each news item
+        sentiments = []
+        processed_news = []
+        
+        for item in news[:10]:  # Process last 10 news items
+            try:
+                # Get publish date
+                date = datetime.fromtimestamp(item['providerPublishTime'])
+                
+                # Analyze sentiment using TextBlob
+                blob = TextBlob(item['title'])
+                sentiment = blob.sentiment.polarity
+                sentiments.append(sentiment)
+                
+                # Add processed news item
+                processed_news.append({
+                    'title': item['title'],
+                    'date': date.strftime('%Y-%m-%d'),
+                    'sentiment': clean_number(sentiment)
+                })
+            except Exception as e:
+                print(f"Error processing news item: {e}")
+                continue
+        
+        # Calculate average sentiment
+        avg_sentiment = statistics.mean(sentiments) if sentiments else 0
+        
+        # Categorize sentiment
+        sentiment_category = categorize_sentiment(avg_sentiment)
+        
+        return {
+            'averageSentiment': clean_number(avg_sentiment),
+            'sentimentCategory': sentiment_category,
+            'newsCount': len(processed_news),
+            'recentNews': processed_news
+        }
+        
+    except Exception as e:
+        raise ValueError(f"Error analyzing news sentiment: {str(e)}")
+
+def categorize_sentiment(sentiment_score):
+
+    if sentiment_score >= 0.5:
+        return 'Very Positive'
+    elif sentiment_score >= 0.1:
+        return 'Positive'
+    elif sentiment_score <= -0.5:
+        return 'Very Negative'
+    elif sentiment_score <= -0.1:
+        return 'Negative'
+    else:
+        return 'Neutral'
 
 def calculate_growth_rate(current, previous):
-  
     try:
         if previous is None or current is None:
             return 0
@@ -192,15 +261,16 @@ def get_metrics(ticker):
     try:
         financial_data = get_quarterly_data(ticker.upper())
         profitability_data = calculate_profitability(financial_data)
+        sentiment_data = get_news_sentiment(ticker.upper())
         
         response = {
             'inputMetrics': financial_data,
-            'profitability': profitability_data
+            'profitability': profitability_data,
+            'sentiment': sentiment_data
         }
-        print(response)
+        
         return jsonify(response)
     except ValueError as e:
         return str(e), 400
-
 if __name__ == '__main__':
     app.run(debug=True)
