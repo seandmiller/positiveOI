@@ -4,93 +4,83 @@ import statistics
 import re
 from transformers import AutoTokenizer, AutoModelForSequenceClassification, pipeline
 import torch
-
+import numpy as np
+from functools import lru_cache
 
 class HeadlineSentimentAnalyzer:
     def __init__(self):
-     
-        self.model_name = "ProsusAI/finbert"
-        try:
-            self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-            self.model = AutoModelForSequenceClassification.from_pretrained(self.model_name)
-            self.device = 0 if torch.cuda.is_available() else -1
-            self.sentiment_pipeline = pipeline(
-                "sentiment-analysis",
-                model=self.model,
-                tokenizer=self.tokenizer,
-                device=self.device
-            )
-        except Exception as e:
-            print(f"Error initializing FinBERT model: {e}")
-            raise
+        """Initialize analyzer with DistilBERT model."""
+        self.model_name = "distilbert-base-uncased-finetuned-sst-2-english"
+        self._model = None
+        self._tokenizer = None
+        self._pipeline = None
+        
+    @property
+    def pipeline(self):
+        
+        if self._pipeline is None:
+            try:
+                # Load tokenizer and model
+                self._tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+                self._model = AutoModelForSequenceClassification.from_pretrained(
+                    self.model_name
+                )
+                
+            
+                self.device = -1
+                print(f"Device set to use cpu")
+                
+                # Create pipeline
+                self._pipeline = pipeline(
+                    "sentiment-analysis",
+                    model=self._model,
+                    tokenizer=self._tokenizer,
+                    device=self.device
+                )
+            except Exception as e:
+                print(f"Error initializing model: {e}")
+                raise
+        return self._pipeline
 
     def _is_relevant_headline(self, headline: str, ticker: str, company_name: Optional[str] = None) -> bool:
-      
+    
         headline_lower = headline.lower()
-        
         stock_pattern = re.compile(rf'{ticker.lower()} stock\b')
         
-     
         if stock_pattern.search(headline_lower):
             return True
-            
 
-                
-        # Check for company name if provided
-        if company_name:
-            company_lower = company_name.lower()
-            company_names = [
-                company_lower,
-                company_lower.replace(" inc", ""),
-                company_lower.replace(" corporation", ""),
-                company_lower.replace(" corp", ""),
-                company_lower.replace(" ltd", ""),
-                company_lower.replace(" llc", "")
-            ]
-            
-            for name in company_names:
-                name_pattern = re.compile(rf'\b{re.escape(name)}\b')
-                if name_pattern.search(headline_lower):
-
-                    return True
-        
         return False
 
-    def analyze_sentiment(self, headline: str) -> Dict[str, Union[float, List[tuple]]]:
-        """Analyze sentiment using FinBERT model."""
+    @lru_cache(maxsize=1000)
+    def _get_sentiment_score(self, headline: str) -> float:
+   
         try:
-            # Get sentiment prediction
-            result = self.sentiment_pipeline(headline)[0]
+         
+            results = self.pipeline(headline)
+            result = results[0]  # Get first result
             
-            # Convert label to score (-1 to 1 range)
-            label_scores = {
-                'positive': 1.0,
-                'negative': -1.0,
-                'neutral': 0.0
-            }
             
-            sentiment_score = label_scores[result['label']] * result['score']
+            if result['label'] == 'POSITIVE':
+                return result['score']
+            else:
+                return -result['score']
             
-            # Create word contributions based on attention weights
-            # Note: This is a simplified version since we can't easily get word-level contributions
-            # from the neural network without additional processing
-            word_contributions = [
-                (headline, round(sentiment_score, 3))
-            ]
-            
-            return {
-                'sentiment': round(sentiment_score, 3),
-                'word_contributions': word_contributions
-            }
         except Exception as e:
             print(f"Error in sentiment analysis: {e}")
-            return {
-                'sentiment': 0.0,
-                'word_contributions': []
-            }
+            return 0.0
+
+    def analyze_sentiment(self, headline: str) -> Dict[str, Union[float, List[tuple]]]:
+        
+        sentiment_score = self._get_sentiment_score(headline)
+        
+        return {
+            'sentiment': round(sentiment_score, 3),
+            'word_contributions': [(headline, round(sentiment_score, 3))]
+        }
 
     def categorize_sentiment(self, sentiment_score: float) -> str:
-        """Categorize sentiment score into labels."""
+      
         if sentiment_score >= 0.5:
             return 'Very Positive'
         elif sentiment_score >= 0.1:
@@ -103,7 +93,7 @@ class HeadlineSentimentAnalyzer:
             return 'Neutral'
 
     def analyze_news_batch(self, news_items: List[Dict], ticker: str = None, company_name: Optional[str] = None) -> Dict:
-        """Analyze a batch of news items."""
+    
         if not news_items:
             return {
                 'averageSentiment': 0,
@@ -120,12 +110,11 @@ class HeadlineSentimentAnalyzer:
         
         for item in news_items:
             try:
-                # Skip if ticker/company provided and headline not relevant
                 if ticker and company_name and not self._is_relevant_headline(item['title'], ticker, company_name):
                     continue
                 
                 relevant_news += 1
-                if len(processed_news) < 10:  # Only process first 10 relevant news items
+                if len(processed_news) < 10:
                     date = datetime.fromtimestamp(item['providerPublishTime'])
                     analysis = self.analyze_sentiment(item['title'])
                     
@@ -149,3 +138,11 @@ class HeadlineSentimentAnalyzer:
             'relevantNewsCount': relevant_news,
             'recentNews': processed_news
         }
+
+    def __del__(self):
+      
+        self._model = None
+        self._tokenizer = None
+        self._pipeline = None
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
