@@ -8,29 +8,20 @@ from functools import lru_cache
 
 class HeadlineSentimentAnalyzer:
     def __init__(self):
-        """
-        Initializes the analyzer to use the Hugging Face Inference API.
-        Requires the HF_TOKEN environment variable to be set.
-        """
-        # The public endpoint for the DistilBERT fine-tuned model
+        """Initializes the analyzer to use the Hugging Face Inference API."""
+        
         self.API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
         
-        # Authentication header using the token set in the environment
         hf_token = os.environ.get("HF_TOKEN")
         if not hf_token:
-            print("WARNING: HF_TOKEN environment variable not set. API calls may fail.")
+            print("WARNING: HF_TOKEN environment variable not set. API calls will fail.")
         self.headers = {"Authorization": f"Bearer {hf_token}"}
         
-        # No model or tokenizer loading here!
-
-    # Removed the @property def pipeline(self): method
-    
     def _query(self, payload: Dict):
         """Sends data to the Hugging Face Inference API."""
         try:
-            # We use json=payload to send the data in the POST body
             response = requests.post(self.API_URL, headers=self.headers, json=payload)
-            response.raise_for_status() # Raises an exception for 4xx/5xx errors
+            response.raise_for_status() 
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Hugging Face API Error: {e}")
@@ -44,24 +35,18 @@ class HeadlineSentimentAnalyzer:
         results = self._query(payload)
         
         if results and isinstance(results, list) and results[0]:
-            # The API returns a structure like: [[{'label': 'NEGATIVE', 'score': 0.999}]]
             result_list = results[0]
-
-            # Extract POSITIVE score and calculate the final sentiment (positive - negative)
             score_map = {item['label']: item['score'] for item in result_list}
             
             pos_score = score_map.get('POSITIVE', 0.0)
             neg_score = score_map.get('NEGATIVE', 0.0)
-
-            # Convert to the desired -1 to +1 range
+            
             if pos_score > neg_score:
-                # If POSITIVE is higher, return the POSITIVE score
                 return pos_score
             else:
-                # If NEGATIVE is higher, return the negative of the NEGATIVE score
                 return -neg_score
         
-        return 0.0 # Return neutral if analysis fails
+        return 0.0
 
     def analyze_sentiment(self, headline: str) -> Dict[str, Union[float, List[tuple]]]:
         sentiment_score = self._get_sentiment_score(headline)
@@ -71,7 +56,7 @@ class HeadlineSentimentAnalyzer:
         }
 
     def categorize_sentiment(self, sentiment_score: float) -> str:
-        # The categorization logic is sound and can be kept here
+        
         if sentiment_score >= 0.5:
             return 'Very Positive'
         elif sentiment_score >= 0.1:
@@ -83,9 +68,15 @@ class HeadlineSentimentAnalyzer:
         else:
             return 'Neutral'
 
+    def _is_relevant_headline(self, headline: str, ticker: str, company_name: Optional[str] = None) -> bool:
+        headline_lower = headline.lower()
+        # Simplified to match just the ticker to keep this function self-contained
+        stock_pattern = re.compile(rf'{ticker.lower()} stock\b|\b{ticker.lower()}\b') 
+        if stock_pattern.search(headline_lower):
+            return True
+        return False
+        
     def analyze_news_batch(self, news_items: List[Dict], ticker: str = None, company_name: Optional[str] = None) -> Dict:
-        # ... (This function remains largely unchanged as its logic is fine)
-        # Note: I omitted the full analyze_news_batch for brevity, assume it uses the updated _get_sentiment_score
         
         if not news_items:
              return {
@@ -101,28 +92,47 @@ class HeadlineSentimentAnalyzer:
         total_news = len(news_items)
         relevant_news = 0
         
-        # ... [omitting the loop for brevity, but it calls self.analyze_sentiment(item['title'])]
+        # Define the expected date format for the nested structure (ISO 8601 string)
+        # Note: '%Y-%m-%dT%H:%M:%SZ' matches '2025-11-01T17:01:53Z' exactly.
+        DATE_FORMAT = '%Y-%m-%dT%H:%M:%SZ'
+        
         for item in news_items:
             try:
-                if ticker and company_name and not self._is_relevant_headline(item['title'], ticker, company_name):
+                # Use the nested title for relevance check
+                headline_to_check = item.get('content', {}).get('title', item.get('title', ''))
+                
+                if ticker and company_name and not self._is_relevant_headline(headline_to_check, ticker, company_name):
                     continue
                 
                 relevant_news += 1
                 if len(processed_news) < 10:
-                    timestamp_value = item.get('pubDate')
-                 
-                    timestamp = timestamp_value / 1000
-                    date = datetime.fromtimestamp(timestamp)
-                    analysis = self.analyze_sentiment(item['title'])
+                    
+                    # 1. Access the date string from the new nested structure
+                    # Use .get() chains for safe access
+                    date_string = item.get('content', {}).get('pubDate')
+                    
+                    if not date_string:
+                        # Skip if the date key is missing
+                        print("Skipping news item: Missing 'content' or 'pubDate' key.")
+                        continue
+                        
+                    # 2. Parse the ISO 8601 string into a datetime object
+                    date = datetime.strptime(date_string, DATE_FORMAT)
+                    
+                    # Use the nested title for sentiment analysis and final result
+                    final_title = item.get('content', {}).get('title', headline_to_check)
+                    
+                    analysis = self.analyze_sentiment(final_title) 
                     
                     sentiments.append(analysis['sentiment'])
                     processed_news.append({
-                        'title': item['title'],
+                        'title': final_title, 
                         'date': date.strftime('%Y-%m-%d'),
                         'sentiment': analysis['sentiment'],
                         'word_contributions': analysis['word_contributions']
                     })
             except Exception as e:
+                # Catching general exception during processing of a single news item
                 print(f"Error processing news item: {e}")
                 continue
         
@@ -135,14 +145,3 @@ class HeadlineSentimentAnalyzer:
             'relevantNewsCount': relevant_news,
             'recentNews': processed_news
         }
-
-
-    def _is_relevant_headline(self, headline: str, ticker: str, company_name: Optional[str] = None) -> bool:
-        # ... (This function remains unchanged)
-        headline_lower = headline.lower()
-        stock_pattern = re.compile(rf'{ticker.lower()} stock\b')
-        if stock_pattern.search(headline_lower):
-            return True
-        return False
-        
-
