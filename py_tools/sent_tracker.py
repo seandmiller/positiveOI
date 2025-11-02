@@ -42,7 +42,7 @@ class HeadlineSentimentAnalyzer:
             
             pos_score = score_map.get('POSITIVE', 0.0)
             neg_score = score_map.get('NEGATIVE', 0.0)
-            
+            print(neg_score)
             if pos_score > neg_score:
                 return pos_score
             else:
