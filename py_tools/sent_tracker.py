@@ -23,6 +23,7 @@ class HeadlineSentimentAnalyzer:
         try:
             response = requests.post(self.API_URL, headers=self.headers, json=payload)
             response.raise_for_status() 
+           
             return response.json()
         except requests.exceptions.RequestException as e:
             print(f"Hugging Face API Error: {e}")
@@ -34,7 +35,7 @@ class HeadlineSentimentAnalyzer:
         
         payload = {"inputs": headline}
         results = self._query(payload)
-        
+        print(results)
         if results and isinstance(results, list) and results[0]:
             result_list = results[0]
             score_map = {item['label']: item['score'] for item in result_list}
