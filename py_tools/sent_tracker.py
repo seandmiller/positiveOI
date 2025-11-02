@@ -109,8 +109,13 @@ class HeadlineSentimentAnalyzer:
                 
                 relevant_news += 1
                 if len(processed_news) < 10:
-                    # Yfinance gives milliseconds timestamps, so divide by 1000
-                    timestamp = item['providerPublishTime'] / 1000
+                        timestamp_value = (
+                        item.get('providerPublishTime') or 
+                        item.get('publishTime') or 
+                        item.get('datetime') or 
+                        item.get('timestamp') # Final fallback
+                    )
+                    timestamp = timestamp_value / 1000
                     date = datetime.fromtimestamp(timestamp)
                     analysis = self.analyze_sentiment(item['title'])
                     
