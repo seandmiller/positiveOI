@@ -107,7 +107,7 @@ class HeadlineSentimentAnalyzer:
                     continue
                 
                 relevant_news += 1
-                if len(processed_news) < 10:
+                if len(processed_news) < 30:
                     
                     # 1. Access the date string from the new nested structure
                     # Use .get() chains for safe access
