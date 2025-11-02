@@ -109,8 +109,8 @@ class HeadlineSentimentAnalyzer:
                 
                 relevant_news += 1
                 if len(processed_news) < 10:
-                    timestamp_value = item.get('providerPublishTime')
-                    print(item)
+                    timestamp_value = item.get('pubDate')
+                 
                     timestamp = timestamp_value / 1000
                     date = datetime.fromtimestamp(timestamp)
                     analysis = self.analyze_sentiment(item['title'])
