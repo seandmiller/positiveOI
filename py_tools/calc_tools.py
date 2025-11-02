@@ -30,7 +30,7 @@ class FinancialCalculator:
         try:
             ticker = yf.Ticker(ticker_symbol)
             income_stmt = ticker.quarterly_income_stmt
-            print(ticker)
+            print(income_stmt)
             if income_stmt.empty:
                 raise ValueError("No financial data available")
 
