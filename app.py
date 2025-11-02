@@ -37,6 +37,7 @@ def get_metrics(ticker):
         
         return jsonify(response)
     except ValueError as e:
+        print(e)
         return str(e), 400
 if __name__ == '__main__':
     app.run(debug=True)
