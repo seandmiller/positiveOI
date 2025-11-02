@@ -5,5 +5,7 @@ numpy==1.26.4
 gunicorn==21.2.0
 textblob==0.17.1
 transformers==4.37.2
-torch==2.1.2
+
+torch==2.1.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
+
 pandas==2.2.0
