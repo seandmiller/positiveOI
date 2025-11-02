@@ -13,6 +13,7 @@ class HeadlineSentimentAnalyzer:
         self.API_URL = "https://api-inference.huggingface.co/models/distilbert-base-uncased-finetuned-sst-2-english"
         
         hf_token = os.environ.get("HF_TOKEN")
+        print(hf_token)
         if not hf_token:
             print("WARNING: HF_TOKEN environment variable not set. API calls will fail.")
         self.headers = {"Authorization": f"Bearer {hf_token}"}
