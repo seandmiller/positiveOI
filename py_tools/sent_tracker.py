@@ -109,7 +109,7 @@ class HeadlineSentimentAnalyzer:
                 
                 relevant_news += 1
                 if len(processed_news) < 10:
-                        timestamp_value = (
+                    timestamp_value = (
                         item.get('providerPublishTime') or 
                         item.get('publishTime') or 
                         item.get('datetime') or 
