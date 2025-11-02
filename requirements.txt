@@ -1,6 +1,6 @@
 Flask==3.0.3
 flask-cors==4.0.1
-yfinance==0.2.51
+yfinance==0.2.66
 gunicorn==21.2.0
 
 requests
