@@ -16,18 +16,6 @@ def get_news_sentiment(ticker_symbol):
     except Exception as e:
         raise ValueError(f"Error analyzing news sentiment: {str(e)}")
 
-def categorize_sentiment(sentiment_score):
-
-    if sentiment_score >= 0.5:
-        return 'Very Positive'
-    elif sentiment_score >= 0.1:
-        return 'Positive'
-    elif sentiment_score <= -0.5:
-        return 'Very Negative'
-    elif sentiment_score <= -0.1:
-        return 'Negative'
-    else:
-        return 'Neutral'
 
 @app.route('/')
 def home():
