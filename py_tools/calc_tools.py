@@ -32,7 +32,7 @@ class FinancialCalculator:
             income_stmt = ticker.quarterly_income_stmt
             print(income_stmt)
             if income_stmt.empty:
-                raise ValueError("No financial data available")
+                raise ValueError(f"Ticker '{ticker_symbol}' failed to return quarterly income statement data. Check the ticker or try again later.")
 
             quarters = income_stmt.columns[:4]
             if len(quarters) < 4:
