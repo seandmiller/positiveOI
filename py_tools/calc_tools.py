@@ -2,7 +2,7 @@ import yfinance as yf
 import numpy as np
 import math
 from typing import Dict, Union
-
+print(yf.__version__)
 class FinancialCalculator:
     @staticmethod
     def clean_number(value: Union[float, np.floating]) -> float:
