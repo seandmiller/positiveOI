@@ -144,6 +144,4 @@ class HeadlineSentimentAnalyzer:
             return True
         return False
         
-    def __del__(self):
-        # The __del__ method is no longer needed since no heavy resources are loaded locally.
-        pass
+
