@@ -10,7 +10,7 @@ class HeadlineSentimentAnalyzer:
     def __init__(self):
         """Initializes the analyzer to use the Hugging Face Inference API."""
         
-        self.API_URL = "https://router.huggingface.co/hf-inference/models/cardiffnlp/twitter-roberta-base-sentiment-latest"
+        self.API_URL = "https://router.huggingface.co/hf-inference/models/distilbert-base-uncased-finetuned-sst-2-english"
         
         hf_token = os.environ.get("HF_TOKEN")
   
